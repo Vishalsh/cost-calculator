@@ -12,8 +12,7 @@ var BILLING_TYPE = {
   DAILY: 'DAILY',
   HOURLY: 'HOURLY'
 },
-    DEFAULT_SELECTED_CURRENCIES = [{ value: 'INR', label: 'INR: Indian Rupee' }, { value: 'USD', label: 'USD: United States Dollar' }, { value: 'GBP', label: 'GBP: British Pound Sterling' }],
-    CURRENCY_LIST = [{ value: 'AUD', label: 'AUD: Australian Dollar' }, { value: 'BGN', label: 'BGN: Bulgarian Lev' }, { value: 'BRL', label: 'BRL: Brazilian Real' }, { value: 'CAD', label: 'CAD: Canadian Dollar' }, { value: 'CHF', label: 'CHF: Swiss Franc' }, { value: 'CNY', label: 'CNY: Chinese Yuan' }, { value: 'CZK', label: 'CZK: Czech Koruna' }, { value: 'DKK', label: 'DKK: Danish Krone' }, { value: 'GBP', label: 'GBP: British Pound Sterling' }, { value: 'HKD', label: 'HKD: Hong Kong Dollar' }, { value: 'HRK', label: 'HRK: Croatian Kuna' }, { value: 'HUF', label: 'HUF: Hungarian Forint' }, { value: 'IDR', label: 'IDR: Indonesian Rupiah' }, { value: 'ILS', label: 'ILS: Israeli New Shekel' }, { value: 'INR', label: 'INR: Indian Rupee' }, { value: 'JPY', label: 'JPY: Japanese Yen' }, { value: 'KRW', label: 'KRW: South Korean Won' }, { value: 'MXN', label: 'MXN: Mexican Peso' }, { value: 'MYR', label: 'MYR: Malaysian Ringgit' }, { value: 'NOK', label: 'NOK: Norwegian Krone' }, { value: 'NZD', label: 'NZD: New Zealand Dollar' }, { value: 'PHP', label: 'PHP: Philippine Peso' }, { value: 'PLN', label: 'PLN: Polish Zloty' }, { value: 'RON', label: 'RON: Romanian Leu' }, { value: 'RUB', label: 'RUB: Russian Ruble' }, { value: 'SEK', label: 'SEK: Swedish Krona' }, { value: 'SGD', label: 'SGD: Singapore Dollar' }, { value: 'THB', label: 'THB: Thai Baht' }, { value: 'TRY', label: 'TRY: Turkish Lira' }, { value: 'USD', label: 'USD: United States Dollar' }, { value: 'ZAR', label: 'ZAR: South African Rand' }],
+    CURRENCY_LIST = [{ value: 'AUD', label: 'AUD: Australian Dollar', symbol: '$' }, { value: 'BGN', label: 'BGN: Bulgarian Lev', symbol: 'лв' }, { value: 'BRL', label: 'BRL: Brazilian Real', symbol: 'R$' }, { value: 'CAD', label: 'CAD: Canadian Dollar', symbol: '$' }, { value: 'CHF', label: 'CHF: Swiss Franc', symbol: 'CHF' }, { value: 'CNY', label: 'CNY: Chinese Yuan', symbol: '¥' }, { value: 'CZK', label: 'CZK: Czech Koruna', symbol: 'Kč' }, { value: 'DKK', label: 'DKK: Danish Krone', symbol: 'kr' }, { value: 'GBP', label: 'GBP: British Pound Sterling', symbol: '£', defaultSelected: true }, { value: 'HKD', label: 'HKD: Hong Kong Dollar', symbol: '$' }, { value: 'HRK', label: 'HRK: Croatian Kuna', symbol: 'kn' }, { value: 'HUF', label: 'HUF: Hungarian Forint', symbol: 'Ft' }, { value: 'IDR', label: 'IDR: Indonesian Rupiah', symbol: 'Rp' }, { value: 'ILS', label: 'ILS: Israeli New Shekel', symbol: '₪' }, { value: 'INR', label: 'INR: Indian Rupee', symbol: '₹', defaultSelected: true }, { value: 'JPY', label: 'JPY: Japanese Yen', symbol: '¥' }, { value: 'KRW', label: 'KRW: South Korean Won', symbol: '₩' }, { value: 'MXN', label: 'MXN: Mexican Peso', symbol: '$' }, { value: 'MYR', label: 'MYR: Malaysian Ringgit', symbol: 'RM' }, { value: 'NOK', label: 'NOK: Norwegian Krone', symbol: 'kr' }, { value: 'NZD', label: 'NZD: New Zealand Dollar', symbol: '$' }, { value: 'PHP', label: 'PHP: Philippine Peso', symbol: '₱' }, { value: 'PLN', label: 'PLN: Polish Zloty', symbol: 'zł' }, { value: 'RON', label: 'RON: Romanian Leu', symbol: 'lei' }, { value: 'RUB', label: 'RUB: Russian Ruble', symbol: '₽' }, { value: 'SEK', label: 'SEK: Swedish Krona', symbol: 'kr' }, { value: 'SGD', label: 'SGD: Singapore Dollar', symbol: '$' }, { value: 'THB', label: 'THB: Thai Baht', symbol: '฿' }, { value: 'TRY', label: 'TRY: Turkish Lira', symbol: '₺' }, { value: 'USD', label: 'USD: United States Dollar', symbol: '$', defaultSelected: true }, { value: 'ZAR', label: 'ZAR: South African Rand', symbol: 'R' }],
     CURRENCY_EXCHANGE_API = 'http://api.fixer.io/latest';
 
 var CurrencyDropdown = function (_React$Component) {
@@ -25,7 +24,7 @@ var CurrencyDropdown = function (_React$Component) {
     var _this = _possibleConstructorReturn(this, (CurrencyDropdown.__proto__ || Object.getPrototypeOf(CurrencyDropdown)).call(this, props));
 
     _this.state = {
-      selectedCurrencies: DEFAULT_SELECTED_CURRENCIES
+      selectedCurrencies: _this.props.defaultSelected || []
     };
     _this.currencyList = CURRENCY_LIST;
 
@@ -56,6 +55,11 @@ var CurrencyDropdown = function (_React$Component) {
 
   return CurrencyDropdown;
 }(React.Component);
+
+CurrencyDropdown.propTypes = {
+  defaultSelected: PropTypes.array,
+  onSelectedCurrenciesChange: PropTypes.func.isRequired
+};
 
 var CurrencyList = function (_React$Component2) {
   _inherits(CurrencyList, _React$Component2);
@@ -108,18 +112,27 @@ var CurrencyList = function (_React$Component2) {
                 'for': currency.value + '_' + _this4.props.billingType },
               currency.label
             ),
-            React.createElement('input', {
-              type: 'text',
-              className: 'form__control',
-              id: currency.value + '_' + _this4.props.billingType,
-              onChange: function onChange() {
-                return _this4.onBaseCurrencyValueChange(currency.value);
-              },
-              ref: function ref(input) {
-                _this4[currency.value] = input;
-              },
-              autoComplete: 'off'
-            })
+            React.createElement(
+              'div',
+              { className: 'flex-box' },
+              React.createElement(
+                'span',
+                { className: 'currency-symbol' },
+                currency.symbol
+              ),
+              React.createElement('input', {
+                type: 'text',
+                className: 'form__control',
+                id: currency.value + '_' + _this4.props.billingType,
+                onChange: function onChange() {
+                  return _this4.onBaseCurrencyValueChange(currency.value);
+                },
+                ref: function ref(input) {
+                  _this4[currency.value] = input;
+                },
+                autoComplete: 'off'
+              })
+            )
           );
         })
       );
@@ -129,6 +142,14 @@ var CurrencyList = function (_React$Component2) {
   return CurrencyList;
 }(React.Component);
 
+CurrencyList.propTypes = {
+  currencies: PropTypes.array.isRequired,
+  onBaseCurrencyValueChange: PropTypes.func.isRequired,
+  currencyExchangeRate: PropTypes.func.isRequired,
+  billingType: PropTypes.string,
+  billingRate: PropTypes.number
+};
+
 var CostCalculator = function (_React$Component3) {
   _inherits(CostCalculator, _React$Component3);
 
@@ -137,8 +158,11 @@ var CostCalculator = function (_React$Component3) {
 
     var _this5 = _possibleConstructorReturn(this, (CostCalculator.__proto__ || Object.getPrototypeOf(CostCalculator)).call(this, props));
 
+    _this5.defaultSelectedCurrencies = CURRENCY_LIST.filter(function (currency) {
+      return currency.defaultSelected;
+    });
     _this5.state = {
-      selectedCurrencies: DEFAULT_SELECTED_CURRENCIES,
+      selectedCurrencies: _this5.defaultSelectedCurrencies,
       currencyExchangeRate: {},
       isFetchingExchangeRate: false
     };
@@ -198,6 +222,7 @@ var CostCalculator = function (_React$Component3) {
         'div',
         { className: 'content-container' },
         React.createElement(CurrencyDropdown, {
+          defaultSelected: this.defaultSelectedCurrencies,
           onSelectedCurrenciesChange: this.onSelectedCurrenciesChange
         }),
         this.state.selectedCurrencies.length ? React.createElement(

@@ -33,7 +33,9 @@ body {
     background-image: none;
     background-clip: padding-box;
     border: 1px solid rgba(0, 0, 0, .15);
-    border-radius: .25rem;
+    border-left: 0;
+    border-top-right-radius: .25rem;
+    border-bottom-right-radius: .25rem;
     transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
     box-sizing: border-box;
 }
@@ -115,5 +117,13 @@ body {
 }
 
 .Select--multi .Select-value-icon {
-    border-right-color: #ffffff;
+    border-right-color: #1F88BF;
+}
+
+.currency-symbol {
+    background: #189BDC;
+    color: #ffffff;
+    padding: 0.6rem 0.7rem;
+    border-top-left-radius: .25rem;
+    border-bottom-left-radius: .25rem;
 }

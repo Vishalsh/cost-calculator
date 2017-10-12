@@ -2,43 +2,38 @@ const BILLING_TYPE = {
     DAILY: 'DAILY',
     HOURLY: 'HOURLY'
   },
-  DEFAULT_SELECTED_CURRENCIES = [
-    {value: 'INR', label: 'INR: Indian Rupee'},
-    {value: 'USD', label: 'USD: United States Dollar'},
-    {value: 'GBP', label: 'GBP: British Pound Sterling'}
-  ],
   CURRENCY_LIST = [
-    {value: 'AUD', label: 'AUD: Australian Dollar'},
-    {value: 'BGN', label: 'BGN: Bulgarian Lev'},
-    {value: 'BRL', label: 'BRL: Brazilian Real'},
-    {value: 'CAD', label: 'CAD: Canadian Dollar'},
-    {value: 'CHF', label: 'CHF: Swiss Franc'},
-    {value: 'CNY', label: 'CNY: Chinese Yuan'},
-    {value: 'CZK', label: 'CZK: Czech Koruna'},
-    {value: 'DKK', label: 'DKK: Danish Krone'},
-    {value: 'GBP', label: 'GBP: British Pound Sterling'},
-    {value: 'HKD', label: 'HKD: Hong Kong Dollar'},
-    {value: 'HRK', label: 'HRK: Croatian Kuna'},
-    {value: 'HUF', label: 'HUF: Hungarian Forint'},
-    {value: 'IDR', label: 'IDR: Indonesian Rupiah'},
-    {value: 'ILS', label: 'ILS: Israeli New Shekel'},
-    {value: 'INR', label: 'INR: Indian Rupee'},
-    {value: 'JPY', label: 'JPY: Japanese Yen'},
-    {value: 'KRW', label: 'KRW: South Korean Won'},
-    {value: 'MXN', label: 'MXN: Mexican Peso'},
-    {value: 'MYR', label: 'MYR: Malaysian Ringgit'},
-    {value: 'NOK', label: 'NOK: Norwegian Krone'},
-    {value: 'NZD', label: 'NZD: New Zealand Dollar'},
-    {value: 'PHP', label: 'PHP: Philippine Peso'},
-    {value: 'PLN', label: 'PLN: Polish Zloty'},
-    {value: 'RON', label: 'RON: Romanian Leu'},
-    {value: 'RUB', label: 'RUB: Russian Ruble'},
-    {value: 'SEK', label: 'SEK: Swedish Krona'},
-    {value: 'SGD', label: 'SGD: Singapore Dollar'},
-    {value: 'THB', label: 'THB: Thai Baht'},
-    {value: 'TRY', label: 'TRY: Turkish Lira'},
-    {value: 'USD', label: 'USD: United States Dollar'},
-    {value: 'ZAR', label: 'ZAR: South African Rand'},
+    {value: 'AUD', label: 'AUD: Australian Dollar', symbol: '$'},
+    {value: 'BGN', label: 'BGN: Bulgarian Lev', symbol: 'лв'},
+    {value: 'BRL', label: 'BRL: Brazilian Real', symbol: 'R$'},
+    {value: 'CAD', label: 'CAD: Canadian Dollar', symbol: '$'},
+    {value: 'CHF', label: 'CHF: Swiss Franc', symbol: 'CHF'},
+    {value: 'CNY', label: 'CNY: Chinese Yuan', symbol: '¥'},
+    {value: 'CZK', label: 'CZK: Czech Koruna', symbol: 'Kč'},
+    {value: 'DKK', label: 'DKK: Danish Krone', symbol: 'kr'},
+    {value: 'GBP', label: 'GBP: British Pound Sterling', symbol: '£', defaultSelected: true},
+    {value: 'HKD', label: 'HKD: Hong Kong Dollar', symbol: '$'},
+    {value: 'HRK', label: 'HRK: Croatian Kuna', symbol: 'kn'},
+    {value: 'HUF', label: 'HUF: Hungarian Forint', symbol: 'Ft'},
+    {value: 'IDR', label: 'IDR: Indonesian Rupiah', symbol: 'Rp'},
+    {value: 'ILS', label: 'ILS: Israeli New Shekel', symbol: '₪'},
+    {value: 'INR', label: 'INR: Indian Rupee', symbol: '₹', defaultSelected: true},
+    {value: 'JPY', label: 'JPY: Japanese Yen', symbol: '¥'},
+    {value: 'KRW', label: 'KRW: South Korean Won', symbol: '₩'},
+    {value: 'MXN', label: 'MXN: Mexican Peso', symbol: '$'},
+    {value: 'MYR', label: 'MYR: Malaysian Ringgit', symbol: 'RM'},
+    {value: 'NOK', label: 'NOK: Norwegian Krone', symbol: 'kr'},
+    {value: 'NZD', label: 'NZD: New Zealand Dollar', symbol: '$'},
+    {value: 'PHP', label: 'PHP: Philippine Peso', symbol: '₱'},
+    {value: 'PLN', label: 'PLN: Polish Zloty', symbol: 'zł'},
+    {value: 'RON', label: 'RON: Romanian Leu', symbol: 'lei'},
+    {value: 'RUB', label: 'RUB: Russian Ruble', symbol: '₽'},
+    {value: 'SEK', label: 'SEK: Swedish Krona', symbol: 'kr'},
+    {value: 'SGD', label: 'SGD: Singapore Dollar', symbol: '$'},
+    {value: 'THB', label: 'THB: Thai Baht', symbol: '฿'},
+    {value: 'TRY', label: 'TRY: Turkish Lira', symbol: '₺'},
+    {value: 'USD', label: 'USD: United States Dollar', symbol: '$', defaultSelected: true},
+    {value: 'ZAR', label: 'ZAR: South African Rand', symbol: 'R'},
   ],
   CURRENCY_EXCHANGE_API = 'http://api.fixer.io/latest';
 
@@ -46,7 +41,7 @@ class CurrencyDropdown extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      selectedCurrencies: DEFAULT_SELECTED_CURRENCIES
+      selectedCurrencies: this.props.defaultSelected || []
     };
     this.currencyList = CURRENCY_LIST;
 
@@ -72,6 +67,11 @@ class CurrencyDropdown extends React.Component {
     )
   }
 }
+
+CurrencyDropdown.propTypes = {
+  defaultSelected: PropTypes.array,
+  onSelectedCurrenciesChange: PropTypes.func.isRequired
+};
 
 class CurrencyList extends React.Component {
   componentWillReceiveProps(nextProps) {
@@ -103,16 +103,19 @@ class CurrencyList extends React.Component {
               <div className="form__group" key={currency}>
                 <label className="form__label"
                        for={`${currency.value}_${this.props.billingType}`}>{currency.label}</label>
-                <input
-                  type="text"
-                  className="form__control"
-                  id={`${currency.value}_${this.props.billingType}`}
-                  onChange={() => this.onBaseCurrencyValueChange(currency.value)}
-                  ref={(input) => {
-                    this[currency.value] = input;
-                  }}
-                  autoComplete="off"
-                />
+                <div className="flex-box">
+                  <span className="currency-symbol">{currency.symbol}</span>
+                  <input
+                    type="text"
+                    className="form__control"
+                    id={`${currency.value}_${this.props.billingType}`}
+                    onChange={() => this.onBaseCurrencyValueChange(currency.value)}
+                    ref={(input) => {
+                      this[currency.value] = input;
+                    }}
+                    autoComplete="off"
+                  />
+                </div>
               </div>
             )
           })
@@ -122,11 +125,20 @@ class CurrencyList extends React.Component {
   }
 }
 
+CurrencyList.propTypes = {
+  currencies: PropTypes.array.isRequired,
+  onBaseCurrencyValueChange: PropTypes.func.isRequired,
+  currencyExchangeRate: PropTypes.func.isRequired,
+  billingType: PropTypes.string,
+  billingRate: PropTypes.number
+};
+
 class CostCalculator extends React.Component {
   constructor(props) {
     super(props);
+    this.defaultSelectedCurrencies = CURRENCY_LIST.filter(currency => currency.defaultSelected);
     this.state = {
-      selectedCurrencies: DEFAULT_SELECTED_CURRENCIES,
+      selectedCurrencies: this.defaultSelectedCurrencies,
       currencyExchangeRate: {},
       isFetchingExchangeRate: false,
     };
@@ -177,6 +189,7 @@ class CostCalculator extends React.Component {
     return (
       <div className="content-container">
         <CurrencyDropdown
+          defaultSelected={this.defaultSelectedCurrencies}
           onSelectedCurrenciesChange={this.onSelectedCurrenciesChange}
         />
 
