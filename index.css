@@ -1,5 +1,6 @@
 body {
     margin: 0;
+    color: #373D45;
 }
 
 .content-container {
@@ -28,7 +29,6 @@ body {
     padding: .5rem .75rem;
     font-size: 1rem;
     line-height: 1.25;
-    color: #495057;
     background-color: #fff;
     background-image: none;
     background-clip: padding-box;
@@ -61,8 +61,11 @@ body {
 }
 
 .form__btn:disabled {
-    background-color: #007bff;
-    border-color: #007bff;
+    background-color: #e3e3e3;
+    color: #373D45;
+    border: none;
+    opacity: 0.65;
+    cursor: not-allowed;
 }
 
 .flex-box {
@@ -98,8 +101,19 @@ body {
     align-items: center;
     justify-content: center;
     height: 100%;
+    font-size: 20px;
 }
 
 .show {
     display: block;
+}
+
+.Select--multi .Select-value {
+    color: white;
+    background: #189BDC;
+    border-radius: 4px;
+}
+
+.Select--multi .Select-value-icon {
+    border-right-color: #ffffff;
 }

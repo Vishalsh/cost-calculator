@@ -1,42 +1,63 @@
-const billingType = {
-  DAILY: 'daily',
-  HOURLY: 'hourly'
-};
+const BILLING_TYPE = {
+    DAILY: 'DAILY',
+    HOURLY: 'HOURLY'
+  },
+  DEFAULT_SELECTED_CURRENCIES = [
+    {value: 'INR', label: 'INR: Indian Rupee'},
+    {value: 'USD', label: 'USD: United States Dollar'},
+    {value: 'GBP', label: 'GBP: British Pound Sterling'}
+  ],
+  CURRENCY_LIST = [
+    {value: 'AUD', label: 'AUD: Australian Dollar'},
+    {value: 'BGN', label: 'BGN: Bulgarian Lev'},
+    {value: 'BRL', label: 'BRL: Brazilian Real'},
+    {value: 'CAD', label: 'CAD: Canadian Dollar'},
+    {value: 'CHF', label: 'CHF: Swiss Franc'},
+    {value: 'CNY', label: 'CNY: Chinese Yuan'},
+    {value: 'CZK', label: 'CZK: Czech Koruna'},
+    {value: 'DKK', label: 'DKK: Danish Krone'},
+    {value: 'GBP', label: 'GBP: British Pound Sterling'},
+    {value: 'HKD', label: 'HKD: Hong Kong Dollar'},
+    {value: 'HRK', label: 'HRK: Croatian Kuna'},
+    {value: 'HUF', label: 'HUF: Hungarian Forint'},
+    {value: 'IDR', label: 'IDR: Indonesian Rupiah'},
+    {value: 'ILS', label: 'ILS: Israeli New Shekel'},
+    {value: 'INR', label: 'INR: Indian Rupee'},
+    {value: 'JPY', label: 'JPY: Japanese Yen'},
+    {value: 'KRW', label: 'KRW: South Korean Won'},
+    {value: 'MXN', label: 'MXN: Mexican Peso'},
+    {value: 'MYR', label: 'MYR: Malaysian Ringgit'},
+    {value: 'NOK', label: 'NOK: Norwegian Krone'},
+    {value: 'NZD', label: 'NZD: New Zealand Dollar'},
+    {value: 'PHP', label: 'PHP: Philippine Peso'},
+    {value: 'PLN', label: 'PLN: Polish Zloty'},
+    {value: 'RON', label: 'RON: Romanian Leu'},
+    {value: 'RUB', label: 'RUB: Russian Ruble'},
+    {value: 'SEK', label: 'SEK: Swedish Krona'},
+    {value: 'SGD', label: 'SGD: Singapore Dollar'},
+    {value: 'THB', label: 'THB: Thai Baht'},
+    {value: 'TRY', label: 'TRY: Turkish Lira'},
+    {value: 'USD', label: 'USD: United States Dollar'},
+    {value: 'ZAR', label: 'ZAR: South African Rand'},
+  ],
+  CURRENCY_EXCHANGE_API = 'http://api.fixer.io/latest';
 
 class CurrencyDropdown extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      currencyOptions: [],
-      isLoading: true,
-      selectedCurrencies: []
+      selectedCurrencies: DEFAULT_SELECTED_CURRENCIES
     };
+    this.currencyList = CURRENCY_LIST;
 
     this.addCurrency = this.addCurrency.bind(this);
   }
 
-  componentDidMount() {
-    fetch('https://openexchangerates.org/api/currencies.json')
-      .then(result => {
-        return result.json();
-      })
-      .then(data => {
-        let currencyOptions = Object.keys(data).map((currencyLabel) => {
-          return {
-            value: currencyLabel,
-            label: `${currencyLabel}: ${data[currencyLabel]}`
-          }
-        });
-
-        this.setState({
-          currencyOptions,
-          isLoading: false
-        })
-      });
-  }
-
-  addCurrency(selectedCurrency) {
-    this.props.onCurrencySelect(selectedCurrency);
+  addCurrency(selectedCurrencies) {
+    this.setState({
+      selectedCurrencies
+    });
+    this.props.onSelectedCurrenciesChange(selectedCurrencies);
   }
 
   render() {
@@ -44,9 +65,8 @@ class CurrencyDropdown extends React.Component {
       <Select
         name="form-field-name"
         value={this.state.selectedCurrencies}
-        joinValues={true}
-        options={this.state.currencyOptions}
-        isLoading={this.state.isLoading}
+        multi={true}
+        options={this.currencyList}
         onChange={this.addCurrency}
       />
     )
@@ -60,10 +80,12 @@ class CurrencyList extends React.Component {
       fx.rates = nextProps.currencyExchangeRate.rates;
 
       nextProps.currencies.forEach((currency) => {
-        this[currency.value].value = fx.convert(Number.parseFloat(nextProps.billingAmount), {
-          from: nextProps.currencyExchangeRate.base,
-          to: currency.value
-        }).toFixed(2)
+        if (fx.rates[currency.value]) {
+          this[currency.value].value = fx.convert(Number.parseFloat(nextProps.billingRate), {
+            from: nextProps.currencyExchangeRate.base,
+            to: currency.value
+          }).toFixed(2);
+        }
       })
     }
   }
@@ -80,7 +102,7 @@ class CurrencyList extends React.Component {
             return (
               <div className="form__group" key={currency}>
                 <label className="form__label"
-                       for={`${currency.value}_${this.props.billingType}`}>{currency.value} - {currency.label}</label>
+                       for={`${currency.value}_${this.props.billingType}`}>{currency.label}</label>
                 <input
                   type="text"
                   className="form__control"
@@ -89,6 +111,7 @@ class CurrencyList extends React.Component {
                   ref={(input) => {
                     this[currency.value] = input;
                   }}
+                  autoComplete="off"
                 />
               </div>
             )
@@ -103,34 +126,34 @@ class CostCalculator extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      selectedCurrencies: [
-        {value: 'INR', label: 'Indian Rupee'},
-        {value: 'USD', label: 'United States Dollar'},
-        {value: 'GBP', label: 'British Pound Sterling'}
-      ],
+      selectedCurrencies: DEFAULT_SELECTED_CURRENCIES,
       currencyExchangeRate: {},
-      isFetchingExchangeRate: false
+      isFetchingExchangeRate: false,
     };
 
-    this.onCurrencySelect = this.onCurrencySelect.bind(this);
+    this.onSelectedCurrenciesChange = this.onSelectedCurrenciesChange.bind(this);
     this.setBaseCurrencyValue = this.setBaseCurrencyValue.bind(this);
-    this.getExchangeValue = this.getExchangeValue.bind(this);
+    this.getExchangeRate = this.getExchangeRate.bind(this);
   }
 
-  onCurrencySelect(selectedCurrency) {
+  onSelectedCurrenciesChange(selectedCurrencies) {
     this.setState({
-      selectedCurrencies: [...this.state.selectedCurrencies, selectedCurrency]
+      selectedCurrencies
     });
   }
 
-  setBaseCurrencyValue(baseCurrency, value, billingType) {
+  setBaseCurrencyValue(baseCurrency, baseCurrencyValue, billingType) {
     this.baseCurrency = baseCurrency;
-    this.baseCurrencyValue = Number.parseFloat(value);
+    this.baseCurrencyValue = baseCurrencyValue;
     this.billingType = billingType;
   }
 
-  getExchangeValue(e) {
+  getExchangeRate(e) {
     e.preventDefault();
+
+    if (!this.baseCurrencyValue) {
+      return;
+    }
 
     this.setState({
       isFetchingExchangeRate: true
@@ -138,7 +161,7 @@ class CostCalculator extends React.Component {
 
     const selectedCurrencies = this.state.selectedCurrencies.map(currency => currency.value).join(',');
 
-    fetch(`http://api.fixer.io/latest?base=${this.baseCurrency}&symbols=${selectedCurrencies}`)
+    fetch(`${CURRENCY_EXCHANGE_API}?base=${this.baseCurrency}&symbols=${selectedCurrencies}`)
       .then(result => {
         return result.json();
       })
@@ -153,41 +176,48 @@ class CostCalculator extends React.Component {
   render() {
     return (
       <div className="content-container">
-        {/*<CurrencyDropdown onCurrencySelect={this.onCurrencySelect}/>*/}
+        <CurrencyDropdown
+          onSelectedCurrenciesChange={this.onSelectedCurrenciesChange}
+        />
 
-        <form className="form" onSubmit={this.getExchangeValue}>
-          <div className="flex-box">
-            <div className="flex-box__item">
-              <h2>Daily Billing rate</h2>
-              <CurrencyList currencies={this.state.selectedCurrencies}
-                            onBaseCurrencyValueChange={this.setBaseCurrencyValue}
-                            currencyExchangeRate={this.state.currencyExchangeRate}
-                            billingType={billingType.DAILY}
-                            billingAmount={this.billingType === billingType.DAILY ? this.baseCurrencyValue : this.baseCurrencyValue * 8}
-              />
-            </div>
+        {
+          this.state.selectedCurrencies.length ?
+            <form className="form" onSubmit={this.getExchangeRate}>
+              <div className="flex-box">
+                <div className="flex-box__item">
+                  <h2>Daily Billing rate</h2>
+                  <CurrencyList currencies={this.state.selectedCurrencies}
+                                onBaseCurrencyValueChange={this.setBaseCurrencyValue}
+                                currencyExchangeRate={this.state.currencyExchangeRate}
+                                billingType={BILLING_TYPE.DAILY}
+                                billingRate={this.billingType === BILLING_TYPE.DAILY ? this.baseCurrencyValue : this.baseCurrencyValue * 8}
+                  />
+                </div>
 
-            <div className="flex-box__item">
-              <h2>Hourly Billing rate</h2>
-              <CurrencyList currencies={this.state.selectedCurrencies}
-                            onBaseCurrencyValueChange={this.setBaseCurrencyValue}
-                            currencyExchangeRate={this.state.currencyExchangeRate}
-                            billingType={billingType.HOURLY}
-                            billingAmount={this.billingType === billingType.HOURLY ? this.baseCurrencyValue : this.baseCurrencyValue / 8}
-              />
-            </div>
-          </div>
+                <div className="flex-box__item">
+                  <h2>Hourly Billing rate</h2>
+                  <CurrencyList currencies={this.state.selectedCurrencies}
+                                onBaseCurrencyValueChange={this.setBaseCurrencyValue}
+                                currencyExchangeRate={this.state.currencyExchangeRate}
+                                billingType={BILLING_TYPE.HOURLY}
+                                billingRate={this.billingType === BILLING_TYPE.HOURLY ? this.baseCurrencyValue : this.baseCurrencyValue / 8}
+                  />
+                </div>
+              </div>
 
-          <div className="form__group text-center">
-            <button type="submit" className="form__btn">
-              Get Value
-            </button>
-          </div>
+              <div className="form__group text-center">
+                <button type="submit" className="form__btn">
+                  Get Value
+                </button>
+              </div>
 
-          <div className={`loading-overlay ${this.state.isFetchingExchangeRate ? 'show' : ''}`}>
-            <strong className="loading-overlay__content">Fetching Latest Exchange Rate...</strong>
-          </div>
-        </form>
+              <div className={`loading-overlay ${this.state.isFetchingExchangeRate ? 'show' : ''}`}>
+                <strong className="loading-overlay__content">Fetching Latest Exchange Rate...</strong>
+              </div>
+            </form>
+            :
+            <h2>Select currencies for exchange rate</h2>
+        }
       </div>
     )
   }

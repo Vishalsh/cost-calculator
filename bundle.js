@@ -2,18 +2,19 @@
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
-
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var billingType = {
-  DAILY: 'daily',
-  HOURLY: 'hourly'
-};
+var BILLING_TYPE = {
+  DAILY: 'DAILY',
+  HOURLY: 'HOURLY'
+},
+    DEFAULT_SELECTED_CURRENCIES = [{ value: 'INR', label: 'INR: Indian Rupee' }, { value: 'USD', label: 'USD: United States Dollar' }, { value: 'GBP', label: 'GBP: British Pound Sterling' }],
+    CURRENCY_LIST = [{ value: 'AUD', label: 'AUD: Australian Dollar' }, { value: 'BGN', label: 'BGN: Bulgarian Lev' }, { value: 'BRL', label: 'BRL: Brazilian Real' }, { value: 'CAD', label: 'CAD: Canadian Dollar' }, { value: 'CHF', label: 'CHF: Swiss Franc' }, { value: 'CNY', label: 'CNY: Chinese Yuan' }, { value: 'CZK', label: 'CZK: Czech Koruna' }, { value: 'DKK', label: 'DKK: Danish Krone' }, { value: 'GBP', label: 'GBP: British Pound Sterling' }, { value: 'HKD', label: 'HKD: Hong Kong Dollar' }, { value: 'HRK', label: 'HRK: Croatian Kuna' }, { value: 'HUF', label: 'HUF: Hungarian Forint' }, { value: 'IDR', label: 'IDR: Indonesian Rupiah' }, { value: 'ILS', label: 'ILS: Israeli New Shekel' }, { value: 'INR', label: 'INR: Indian Rupee' }, { value: 'JPY', label: 'JPY: Japanese Yen' }, { value: 'KRW', label: 'KRW: South Korean Won' }, { value: 'MXN', label: 'MXN: Mexican Peso' }, { value: 'MYR', label: 'MYR: Malaysian Ringgit' }, { value: 'NOK', label: 'NOK: Norwegian Krone' }, { value: 'NZD', label: 'NZD: New Zealand Dollar' }, { value: 'PHP', label: 'PHP: Philippine Peso' }, { value: 'PLN', label: 'PLN: Polish Zloty' }, { value: 'RON', label: 'RON: Romanian Leu' }, { value: 'RUB', label: 'RUB: Russian Ruble' }, { value: 'SEK', label: 'SEK: Swedish Krona' }, { value: 'SGD', label: 'SGD: Singapore Dollar' }, { value: 'THB', label: 'THB: Thai Baht' }, { value: 'TRY', label: 'TRY: Turkish Lira' }, { value: 'USD', label: 'USD: United States Dollar' }, { value: 'ZAR', label: 'ZAR: South African Rand' }],
+    CURRENCY_EXCHANGE_API = 'http://api.fixer.io/latest';
 
 var CurrencyDropdown = function (_React$Component) {
   _inherits(CurrencyDropdown, _React$Component);
@@ -24,40 +25,21 @@ var CurrencyDropdown = function (_React$Component) {
     var _this = _possibleConstructorReturn(this, (CurrencyDropdown.__proto__ || Object.getPrototypeOf(CurrencyDropdown)).call(this, props));
 
     _this.state = {
-      currencyOptions: [],
-      isLoading: true,
-      selectedCurrencies: []
+      selectedCurrencies: DEFAULT_SELECTED_CURRENCIES
     };
+    _this.currencyList = CURRENCY_LIST;
 
     _this.addCurrency = _this.addCurrency.bind(_this);
     return _this;
   }
 
   _createClass(CurrencyDropdown, [{
-    key: 'componentDidMount',
-    value: function componentDidMount() {
-      var _this2 = this;
-
-      fetch('https://openexchangerates.org/api/currencies.json').then(function (result) {
-        return result.json();
-      }).then(function (data) {
-        var currencyOptions = Object.keys(data).map(function (currencyLabel) {
-          return {
-            value: currencyLabel,
-            label: currencyLabel + ': ' + data[currencyLabel]
-          };
-        });
-
-        _this2.setState({
-          currencyOptions: currencyOptions,
-          isLoading: false
-        });
-      });
-    }
-  }, {
     key: 'addCurrency',
-    value: function addCurrency(selectedCurrency) {
-      this.props.onCurrencySelect(selectedCurrency);
+    value: function addCurrency(selectedCurrencies) {
+      this.setState({
+        selectedCurrencies: selectedCurrencies
+      });
+      this.props.onSelectedCurrenciesChange(selectedCurrencies);
     }
   }, {
     key: 'render',
@@ -65,9 +47,8 @@ var CurrencyDropdown = function (_React$Component) {
       return React.createElement(Select, {
         name: 'form-field-name',
         value: this.state.selectedCurrencies,
-        joinValues: true,
-        options: this.state.currencyOptions,
-        isLoading: this.state.isLoading,
+        multi: true,
+        options: this.currencyList,
         onChange: this.addCurrency
       });
     }
@@ -88,17 +69,19 @@ var CurrencyList = function (_React$Component2) {
   _createClass(CurrencyList, [{
     key: 'componentWillReceiveProps',
     value: function componentWillReceiveProps(nextProps) {
-      var _this4 = this;
+      var _this3 = this;
 
       if (nextProps.currencyExchangeRate.rates) {
         fx.base = nextProps.currencyExchangeRate.base;
         fx.rates = nextProps.currencyExchangeRate.rates;
 
         nextProps.currencies.forEach(function (currency) {
-          _this4[currency.value].value = fx.convert(Number.parseFloat(nextProps.billingAmount), {
-            from: nextProps.currencyExchangeRate.base,
-            to: currency.value
-          }).toFixed(2);
+          if (fx.rates[currency.value]) {
+            _this3[currency.value].value = fx.convert(Number.parseFloat(nextProps.billingRate), {
+              from: nextProps.currencyExchangeRate.base,
+              to: currency.value
+            }).toFixed(2);
+          }
         });
       }
     }
@@ -110,7 +93,7 @@ var CurrencyList = function (_React$Component2) {
   }, {
     key: 'render',
     value: function render() {
-      var _this5 = this;
+      var _this4 = this;
 
       return React.createElement(
         'div',
@@ -122,21 +105,20 @@ var CurrencyList = function (_React$Component2) {
             React.createElement(
               'label',
               { className: 'form__label',
-                'for': currency.value + '_' + _this5.props.billingType },
-              currency.value,
-              ' - ',
+                'for': currency.value + '_' + _this4.props.billingType },
               currency.label
             ),
             React.createElement('input', {
               type: 'text',
               className: 'form__control',
-              id: currency.value + '_' + _this5.props.billingType,
+              id: currency.value + '_' + _this4.props.billingType,
               onChange: function onChange() {
-                return _this5.onBaseCurrencyValueChange(currency.value);
+                return _this4.onBaseCurrencyValueChange(currency.value);
               },
               ref: function ref(input) {
-                _this5[currency.value] = input;
-              }
+                _this4[currency.value] = input;
+              },
+              autoComplete: 'off'
             })
           );
         })
@@ -153,40 +135,44 @@ var CostCalculator = function (_React$Component3) {
   function CostCalculator(props) {
     _classCallCheck(this, CostCalculator);
 
-    var _this6 = _possibleConstructorReturn(this, (CostCalculator.__proto__ || Object.getPrototypeOf(CostCalculator)).call(this, props));
+    var _this5 = _possibleConstructorReturn(this, (CostCalculator.__proto__ || Object.getPrototypeOf(CostCalculator)).call(this, props));
 
-    _this6.state = {
-      selectedCurrencies: [{ value: 'INR', label: 'Indian Rupee' }, { value: 'USD', label: 'United States Dollar' }, { value: 'GBP', label: 'British Pound Sterling' }],
+    _this5.state = {
+      selectedCurrencies: DEFAULT_SELECTED_CURRENCIES,
       currencyExchangeRate: {},
       isFetchingExchangeRate: false
     };
 
-    _this6.onCurrencySelect = _this6.onCurrencySelect.bind(_this6);
-    _this6.setBaseCurrencyValue = _this6.setBaseCurrencyValue.bind(_this6);
-    _this6.getExchangeValue = _this6.getExchangeValue.bind(_this6);
-    return _this6;
+    _this5.onSelectedCurrenciesChange = _this5.onSelectedCurrenciesChange.bind(_this5);
+    _this5.setBaseCurrencyValue = _this5.setBaseCurrencyValue.bind(_this5);
+    _this5.getExchangeRate = _this5.getExchangeRate.bind(_this5);
+    return _this5;
   }
 
   _createClass(CostCalculator, [{
-    key: 'onCurrencySelect',
-    value: function onCurrencySelect(selectedCurrency) {
+    key: 'onSelectedCurrenciesChange',
+    value: function onSelectedCurrenciesChange(selectedCurrencies) {
       this.setState({
-        selectedCurrencies: [].concat(_toConsumableArray(this.state.selectedCurrencies), [selectedCurrency])
+        selectedCurrencies: selectedCurrencies
       });
     }
   }, {
     key: 'setBaseCurrencyValue',
-    value: function setBaseCurrencyValue(baseCurrency, value, billingType) {
+    value: function setBaseCurrencyValue(baseCurrency, baseCurrencyValue, billingType) {
       this.baseCurrency = baseCurrency;
-      this.baseCurrencyValue = Number.parseFloat(value);
+      this.baseCurrencyValue = baseCurrencyValue;
       this.billingType = billingType;
     }
   }, {
-    key: 'getExchangeValue',
-    value: function getExchangeValue(e) {
-      var _this7 = this;
+    key: 'getExchangeRate',
+    value: function getExchangeRate(e) {
+      var _this6 = this;
 
       e.preventDefault();
+
+      if (!this.baseCurrencyValue) {
+        return;
+      }
 
       this.setState({
         isFetchingExchangeRate: true
@@ -196,10 +182,10 @@ var CostCalculator = function (_React$Component3) {
         return currency.value;
       }).join(',');
 
-      fetch('http://api.fixer.io/latest?base=' + this.baseCurrency + '&symbols=' + selectedCurrencies).then(function (result) {
+      fetch(CURRENCY_EXCHANGE_API + '?base=' + this.baseCurrency + '&symbols=' + selectedCurrencies).then(function (result) {
         return result.json();
       }).then(function (data) {
-        _this7.setState({
+        _this6.setState({
           currencyExchangeRate: data,
           isFetchingExchangeRate: false
         });
@@ -211,9 +197,12 @@ var CostCalculator = function (_React$Component3) {
       return React.createElement(
         'div',
         { className: 'content-container' },
-        React.createElement(
+        React.createElement(CurrencyDropdown, {
+          onSelectedCurrenciesChange: this.onSelectedCurrenciesChange
+        }),
+        this.state.selectedCurrencies.length ? React.createElement(
           'form',
-          { className: 'form', onSubmit: this.getExchangeValue },
+          { className: 'form', onSubmit: this.getExchangeRate },
           React.createElement(
             'div',
             { className: 'flex-box' },
@@ -228,8 +217,8 @@ var CostCalculator = function (_React$Component3) {
               React.createElement(CurrencyList, { currencies: this.state.selectedCurrencies,
                 onBaseCurrencyValueChange: this.setBaseCurrencyValue,
                 currencyExchangeRate: this.state.currencyExchangeRate,
-                billingType: billingType.DAILY,
-                billingAmount: this.billingType === billingType.DAILY ? this.baseCurrencyValue : this.baseCurrencyValue * 8
+                billingType: BILLING_TYPE.DAILY,
+                billingRate: this.billingType === BILLING_TYPE.DAILY ? this.baseCurrencyValue : this.baseCurrencyValue * 8
               })
             ),
             React.createElement(
@@ -243,8 +232,8 @@ var CostCalculator = function (_React$Component3) {
               React.createElement(CurrencyList, { currencies: this.state.selectedCurrencies,
                 onBaseCurrencyValueChange: this.setBaseCurrencyValue,
                 currencyExchangeRate: this.state.currencyExchangeRate,
-                billingType: billingType.HOURLY,
-                billingAmount: this.billingType === billingType.HOURLY ? this.baseCurrencyValue : this.baseCurrencyValue / 8
+                billingType: BILLING_TYPE.HOURLY,
+                billingRate: this.billingType === BILLING_TYPE.HOURLY ? this.baseCurrencyValue : this.baseCurrencyValue / 8
               })
             )
           ),
@@ -266,6 +255,10 @@ var CostCalculator = function (_React$Component3) {
               'Fetching Latest Exchange Rate...'
             )
           )
+        ) : React.createElement(
+          'h2',
+          null,
+          'Select currencies for exchange rate'
         )
       );
     }
