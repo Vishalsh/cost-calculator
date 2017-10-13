@@ -60,15 +60,15 @@ body {
     line-height: 1.25;
     border-radius: .25rem;
     transition: all .15s ease-in-out;
-    margin-top: 15px;
+    margin: 15px 15px 0 0;
 }
 
-.form__btn:disabled {
-    background-color: #e3e3e3;
+.form__btn--reset {
+    background-color: #ffffff;
     color: #373D45;
-    border: none;
+    border-color: #cccccc;
     opacity: 0.65;
-    cursor: not-allowed;
+    margin: 15px 0 0 15px;
 }
 
 .flex-box {

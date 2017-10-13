@@ -226,6 +226,11 @@ var CostCalculator = function (_React$Component2) {
               'button',
               { type: 'submit', className: 'form__btn' },
               'Get Value'
+            ),
+            React.createElement(
+              'button',
+              { type: 'reset', value: 'Reset', className: 'form__btn form__btn--reset' },
+              'Reset'
             )
           ),
           React.createElement(

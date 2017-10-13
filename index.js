@@ -189,6 +189,10 @@ class CostCalculator extends React.Component {
                 <button type="submit" className="form__btn">
                   Get Value
                 </button>
+
+                <button type="reset" value="Reset" className="form__btn form__btn--reset">
+                  Reset
+                </button>
               </div>
 
               <div className={`loading-overlay ${this.state.isFetchingExchangeRate ? 'show' : ''}`}>
