@@ -35,43 +35,7 @@ const BILLING_TYPE = {
     {value: 'USD', label: 'USD: United States Dollar', symbol: '$', defaultSelected: true},
     {value: 'ZAR', label: 'ZAR: South African Rand', symbol: 'R'},
   ],
-  CURRENCY_EXCHANGE_API = 'http://api.fixer.io/latest';
-
-class CurrencyDropdown extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      selectedCurrencies: this.props.defaultSelected || []
-    };
-    this.currencyList = CURRENCY_LIST;
-
-    this.addCurrency = this.addCurrency.bind(this);
-  }
-
-  addCurrency(selectedCurrencies) {
-    this.setState({
-      selectedCurrencies
-    });
-    this.props.onSelectedCurrenciesChange(selectedCurrencies);
-  }
-
-  render() {
-    return (
-      <Select
-        name="form-field-name"
-        value={this.state.selectedCurrencies}
-        multi={true}
-        options={this.currencyList}
-        onChange={this.addCurrency}
-      />
-    )
-  }
-}
-
-CurrencyDropdown.propTypes = {
-  defaultSelected: PropTypes.array,
-  onSelectedCurrenciesChange: PropTypes.func.isRequired
-};
+  CURRENCY_EXCHANGE_API = 'https://api.fixer.io/latest';
 
 class CurrencyList extends React.Component {
   componentWillReceiveProps(nextProps) {
@@ -143,12 +107,12 @@ class CostCalculator extends React.Component {
       isFetchingExchangeRate: false,
     };
 
-    this.onSelectedCurrenciesChange = this.onSelectedCurrenciesChange.bind(this);
     this.setBaseCurrencyValue = this.setBaseCurrencyValue.bind(this);
+    this.updateCurrencyList = this.updateCurrencyList.bind(this);
     this.getExchangeRate = this.getExchangeRate.bind(this);
   }
 
-  onSelectedCurrenciesChange(selectedCurrencies) {
+  updateCurrencyList(selectedCurrencies) {
     this.setState({
       selectedCurrencies
     });
@@ -188,9 +152,12 @@ class CostCalculator extends React.Component {
   render() {
     return (
       <div className="content-container">
-        <CurrencyDropdown
-          defaultSelected={this.defaultSelectedCurrencies}
-          onSelectedCurrenciesChange={this.onSelectedCurrenciesChange}
+        <Select
+          name="form-field-name"
+          value={this.state.selectedCurrencies}
+          multi={true}
+          options={CURRENCY_LIST}
+          onChange={this.updateCurrencyList}
         />
 
         {

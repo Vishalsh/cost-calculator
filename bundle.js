@@ -13,56 +13,10 @@ var BILLING_TYPE = {
   HOURLY: 'HOURLY'
 },
     CURRENCY_LIST = [{ value: 'AUD', label: 'AUD: Australian Dollar', symbol: '$' }, { value: 'BGN', label: 'BGN: Bulgarian Lev', symbol: 'лв' }, { value: 'BRL', label: 'BRL: Brazilian Real', symbol: 'R$' }, { value: 'CAD', label: 'CAD: Canadian Dollar', symbol: '$' }, { value: 'CHF', label: 'CHF: Swiss Franc', symbol: 'CHF' }, { value: 'CNY', label: 'CNY: Chinese Yuan', symbol: '¥' }, { value: 'CZK', label: 'CZK: Czech Koruna', symbol: 'Kč' }, { value: 'DKK', label: 'DKK: Danish Krone', symbol: 'kr' }, { value: 'GBP', label: 'GBP: British Pound Sterling', symbol: '£', defaultSelected: true }, { value: 'HKD', label: 'HKD: Hong Kong Dollar', symbol: '$' }, { value: 'HRK', label: 'HRK: Croatian Kuna', symbol: 'kn' }, { value: 'HUF', label: 'HUF: Hungarian Forint', symbol: 'Ft' }, { value: 'IDR', label: 'IDR: Indonesian Rupiah', symbol: 'Rp' }, { value: 'ILS', label: 'ILS: Israeli New Shekel', symbol: '₪' }, { value: 'INR', label: 'INR: Indian Rupee', symbol: '₹', defaultSelected: true }, { value: 'JPY', label: 'JPY: Japanese Yen', symbol: '¥' }, { value: 'KRW', label: 'KRW: South Korean Won', symbol: '₩' }, { value: 'MXN', label: 'MXN: Mexican Peso', symbol: '$' }, { value: 'MYR', label: 'MYR: Malaysian Ringgit', symbol: 'RM' }, { value: 'NOK', label: 'NOK: Norwegian Krone', symbol: 'kr' }, { value: 'NZD', label: 'NZD: New Zealand Dollar', symbol: '$' }, { value: 'PHP', label: 'PHP: Philippine Peso', symbol: '₱' }, { value: 'PLN', label: 'PLN: Polish Zloty', symbol: 'zł' }, { value: 'RON', label: 'RON: Romanian Leu', symbol: 'lei' }, { value: 'RUB', label: 'RUB: Russian Ruble', symbol: '₽' }, { value: 'SEK', label: 'SEK: Swedish Krona', symbol: 'kr' }, { value: 'SGD', label: 'SGD: Singapore Dollar', symbol: '$' }, { value: 'THB', label: 'THB: Thai Baht', symbol: '฿' }, { value: 'TRY', label: 'TRY: Turkish Lira', symbol: '₺' }, { value: 'USD', label: 'USD: United States Dollar', symbol: '$', defaultSelected: true }, { value: 'ZAR', label: 'ZAR: South African Rand', symbol: 'R' }],
-    CURRENCY_EXCHANGE_API = 'http://api.fixer.io/latest';
+    CURRENCY_EXCHANGE_API = 'https://api.fixer.io/latest';
 
-var CurrencyDropdown = function (_React$Component) {
-  _inherits(CurrencyDropdown, _React$Component);
-
-  function CurrencyDropdown(props) {
-    _classCallCheck(this, CurrencyDropdown);
-
-    var _this = _possibleConstructorReturn(this, (CurrencyDropdown.__proto__ || Object.getPrototypeOf(CurrencyDropdown)).call(this, props));
-
-    _this.state = {
-      selectedCurrencies: _this.props.defaultSelected || []
-    };
-    _this.currencyList = CURRENCY_LIST;
-
-    _this.addCurrency = _this.addCurrency.bind(_this);
-    return _this;
-  }
-
-  _createClass(CurrencyDropdown, [{
-    key: 'addCurrency',
-    value: function addCurrency(selectedCurrencies) {
-      this.setState({
-        selectedCurrencies: selectedCurrencies
-      });
-      this.props.onSelectedCurrenciesChange(selectedCurrencies);
-    }
-  }, {
-    key: 'render',
-    value: function render() {
-      return React.createElement(Select, {
-        name: 'form-field-name',
-        value: this.state.selectedCurrencies,
-        multi: true,
-        options: this.currencyList,
-        onChange: this.addCurrency
-      });
-    }
-  }]);
-
-  return CurrencyDropdown;
-}(React.Component);
-
-CurrencyDropdown.propTypes = {
-  defaultSelected: PropTypes.array,
-  onSelectedCurrenciesChange: PropTypes.func.isRequired
-};
-
-var CurrencyList = function (_React$Component2) {
-  _inherits(CurrencyList, _React$Component2);
+var CurrencyList = function (_React$Component) {
+  _inherits(CurrencyList, _React$Component);
 
   function CurrencyList() {
     _classCallCheck(this, CurrencyList);
@@ -73,7 +27,7 @@ var CurrencyList = function (_React$Component2) {
   _createClass(CurrencyList, [{
     key: 'componentWillReceiveProps',
     value: function componentWillReceiveProps(nextProps) {
-      var _this3 = this;
+      var _this2 = this;
 
       if (nextProps.currencyExchangeRate.rates) {
         fx.base = nextProps.currencyExchangeRate.base;
@@ -81,7 +35,7 @@ var CurrencyList = function (_React$Component2) {
 
         nextProps.currencies.forEach(function (currency) {
           if (fx.rates[currency.value]) {
-            _this3[currency.value].value = fx.convert(Number.parseFloat(nextProps.billingRate), {
+            _this2[currency.value].value = fx.convert(Number.parseFloat(nextProps.billingRate), {
               from: nextProps.currencyExchangeRate.base,
               to: currency.value
             }).toFixed(2);
@@ -97,7 +51,7 @@ var CurrencyList = function (_React$Component2) {
   }, {
     key: 'render',
     value: function render() {
-      var _this4 = this;
+      var _this3 = this;
 
       return React.createElement(
         'div',
@@ -109,7 +63,7 @@ var CurrencyList = function (_React$Component2) {
             React.createElement(
               'label',
               { className: 'form__label',
-                'for': currency.value + '_' + _this4.props.billingType },
+                'for': currency.value + '_' + _this3.props.billingType },
               currency.label
             ),
             React.createElement(
@@ -123,12 +77,12 @@ var CurrencyList = function (_React$Component2) {
               React.createElement('input', {
                 type: 'text',
                 className: 'form__control',
-                id: currency.value + '_' + _this4.props.billingType,
+                id: currency.value + '_' + _this3.props.billingType,
                 onChange: function onChange() {
-                  return _this4.onBaseCurrencyValueChange(currency.value);
+                  return _this3.onBaseCurrencyValueChange(currency.value);
                 },
                 ref: function ref(input) {
-                  _this4[currency.value] = input;
+                  _this3[currency.value] = input;
                 },
                 autoComplete: 'off'
               })
@@ -150,32 +104,32 @@ CurrencyList.propTypes = {
   billingRate: PropTypes.number
 };
 
-var CostCalculator = function (_React$Component3) {
-  _inherits(CostCalculator, _React$Component3);
+var CostCalculator = function (_React$Component2) {
+  _inherits(CostCalculator, _React$Component2);
 
   function CostCalculator(props) {
     _classCallCheck(this, CostCalculator);
 
-    var _this5 = _possibleConstructorReturn(this, (CostCalculator.__proto__ || Object.getPrototypeOf(CostCalculator)).call(this, props));
+    var _this4 = _possibleConstructorReturn(this, (CostCalculator.__proto__ || Object.getPrototypeOf(CostCalculator)).call(this, props));
 
-    _this5.defaultSelectedCurrencies = CURRENCY_LIST.filter(function (currency) {
+    _this4.defaultSelectedCurrencies = CURRENCY_LIST.filter(function (currency) {
       return currency.defaultSelected;
     });
-    _this5.state = {
-      selectedCurrencies: _this5.defaultSelectedCurrencies,
+    _this4.state = {
+      selectedCurrencies: _this4.defaultSelectedCurrencies,
       currencyExchangeRate: {},
       isFetchingExchangeRate: false
     };
 
-    _this5.onSelectedCurrenciesChange = _this5.onSelectedCurrenciesChange.bind(_this5);
-    _this5.setBaseCurrencyValue = _this5.setBaseCurrencyValue.bind(_this5);
-    _this5.getExchangeRate = _this5.getExchangeRate.bind(_this5);
-    return _this5;
+    _this4.setBaseCurrencyValue = _this4.setBaseCurrencyValue.bind(_this4);
+    _this4.updateCurrencyList = _this4.updateCurrencyList.bind(_this4);
+    _this4.getExchangeRate = _this4.getExchangeRate.bind(_this4);
+    return _this4;
   }
 
   _createClass(CostCalculator, [{
-    key: 'onSelectedCurrenciesChange',
-    value: function onSelectedCurrenciesChange(selectedCurrencies) {
+    key: 'updateCurrencyList',
+    value: function updateCurrencyList(selectedCurrencies) {
       this.setState({
         selectedCurrencies: selectedCurrencies
       });
@@ -190,7 +144,7 @@ var CostCalculator = function (_React$Component3) {
   }, {
     key: 'getExchangeRate',
     value: function getExchangeRate(e) {
-      var _this6 = this;
+      var _this5 = this;
 
       e.preventDefault();
 
@@ -209,7 +163,7 @@ var CostCalculator = function (_React$Component3) {
       fetch(CURRENCY_EXCHANGE_API + '?base=' + this.baseCurrency + '&symbols=' + selectedCurrencies).then(function (result) {
         return result.json();
       }).then(function (data) {
-        _this6.setState({
+        _this5.setState({
           currencyExchangeRate: data,
           isFetchingExchangeRate: false
         });
@@ -221,9 +175,12 @@ var CostCalculator = function (_React$Component3) {
       return React.createElement(
         'div',
         { className: 'content-container' },
-        React.createElement(CurrencyDropdown, {
-          defaultSelected: this.defaultSelectedCurrencies,
-          onSelectedCurrenciesChange: this.onSelectedCurrenciesChange
+        React.createElement(Select, {
+          name: 'form-field-name',
+          value: this.state.selectedCurrencies,
+          multi: true,
+          options: CURRENCY_LIST,
+          onChange: this.updateCurrencyList
         }),
         this.state.selectedCurrencies.length ? React.createElement(
           'form',
