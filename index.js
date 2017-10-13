@@ -11,6 +11,7 @@ const BILLING_TYPE = {
     {value: 'CNY', label: 'CNY: Chinese Yuan', symbol: '¥'},
     {value: 'CZK', label: 'CZK: Czech Koruna', symbol: 'Kč'},
     {value: 'DKK', label: 'DKK: Danish Krone', symbol: 'kr'},
+    {value: 'EUR', label: 'EUR: Euro', symbol: '€'},
     {value: 'GBP', label: 'GBP: British Pound Sterling', symbol: '£', defaultSelected: true},
     {value: 'HKD', label: 'HKD: Hong Kong Dollar', symbol: '$'},
     {value: 'HRK', label: 'HRK: Croatian Kuna', symbol: 'kn'},
