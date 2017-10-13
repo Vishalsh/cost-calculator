@@ -45,7 +45,7 @@ class CurrencyList extends React.Component {
       fx.rates = nextProps.currencyExchangeRate.rates;
 
       nextProps.currencies.forEach((currency) => {
-        if (fx.rates[currency.value]) {
+        if (fx.rates[currency.value] || fx.base === currency.value) {
           this[currency.value].value = fx.convert(Number.parseFloat(nextProps.billingRate), {
             from: nextProps.currencyExchangeRate.base,
             to: currency.value

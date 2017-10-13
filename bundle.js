@@ -34,7 +34,7 @@ var CurrencyList = function (_React$Component) {
         fx.rates = nextProps.currencyExchangeRate.rates;
 
         nextProps.currencies.forEach(function (currency) {
-          if (fx.rates[currency.value]) {
+          if (fx.rates[currency.value] || fx.base === currency.value) {
             _this2[currency.value].value = fx.convert(Number.parseFloat(nextProps.billingRate), {
               from: nextProps.currencyExchangeRate.base,
               to: currency.value
